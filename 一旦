@@ -1,0 +1,62 @@
+スクリーンショット2: RAG検索の結果（重要）
+Step 1: ドキュメントを3つ作成
+Swagger UI で:
+
+Authorize をクリック
+POST /auth/register を実行
+
+json   {
+     "email": "demo@example.com",
+     "password": "Password123"
+   }
+
+レスポンスの access_token をコピー
+Authorize にトークンを貼り付け
+POST /documents を3回実行
+
+1回目:
+json{
+  "title": "FastAPIについて",
+  "content": "FastAPIはPythonの高速なWebフレームワークです。型ヒントを使って自動的にAPIドキュメントを生成します。非同期処理に対応しており、高いパフォーマンスを発揮します。"
+}
+2回目:
+json{
+  "title": "Supabaseについて",
+  "content": "SupabaseはオープンソースのFirebase代替です。PostgreSQLデータベースを提供し、リアルタイム機能や認証機能も備えています。無料枠でも500MBのストレージが利用できます。"
+}
+3回目:
+json{
+  "title": "RAGについて",
+  "content": "RAG（Retrieval-Augmented Generation）は、外部の知識ベースから情報を取得してLLMに渡す技術です。ベクトル検索を使って関連文書を見つけ、それをコンテキストとしてLLMに与えることで、より正確な回答を生成できます。"
+}
+
+Step 2: RAG検索を実行
+POST /search を開く
+Request body:
+json{
+  "query": "FastAPIの特徴は？",
+  "top_k": 3
+}
+Execute をクリック
+
+Step 3: レスポンスが表示されたらスクリーンショット
+レスポンス例:
+json{
+  "query": "FastAPIの特徴は？",
+  "answer": "FastAPIの主な特徴は以下の通りです：\n1. 高速なWebフレームワーク\n2. 型ヒントを使った自動APIドキュメント生成\n3. 非同期処理対応\n4. 高いパフォーマンス",
+  "sources": [
+    {
+      "document_id": 1,
+      "title": "FastAPIについて",
+      "content": "FastAPIはPythonの...",
+      "distance": 0.234
+    }
+  ]
+}
+このレスポンスが表示されてる画面をスクリーンショット:
+
+Cmd + Shift + 4
+レスポンスエリアを選択
+クリック
+screenshots フォルダに移動
+rag-search.png にリネーム
