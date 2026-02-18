@@ -60,9 +60,9 @@ async def search_documents(
     context_parts = []
     sources = []
     
-    for metadata, distance in search_results:
-        # コンテキストに追加
-        context_parts.append(f"【{metadata['title']}】\n{metadata['content']}")
+    for i, (metadata, distance) in enumerate(search_results, 1):
+        # ドキュメント番号付きでコンテキストに追加
+        context_parts.append(f"【資料{i}: {metadata['title']}】\n{metadata['content']}")
         
         # ソース情報を保存
         sources.append(SearchSource(
@@ -97,7 +97,9 @@ async def search_documents(
 
 【回答のルール】
 - ドキュメントの内容に基づいて回答する
-- ドキュメントに情報がない場合は「ドキュメントには記載がありません」と答える
+- 回答の冒頭で「資料によると〜」「ドキュメントによると〜」などの自然な表現を使う
+- 複数のドキュメントを参照する場合は「資料1によると〜。また資料2では〜」のように区別する
+- ドキュメントに情報がない場合は「申し訳ありませんが、ご提供いただいた資料にはその情報が見当たりませんでした」と答える
 - 簡潔で分かりやすく答える
 - 日本語で回答する
 """
