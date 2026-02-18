@@ -20,7 +20,8 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "http://127.0.0.1:3000",
-        "https://rag-knowledge-api.onrender.com"
+        "https://rag-knowledge-api.onrender.com",
+        "https://rag-knowledge-frontend-q9bo.vercel.app"
     ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
