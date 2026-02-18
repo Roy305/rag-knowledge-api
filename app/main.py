@@ -4,9 +4,23 @@ from sqlalchemy.orm import Session
 from sqlalchemy import text
 from app.core.deps import get_db
 from app.config import settings
-from app.api import auth  # ✅ 追加：認証用のルーターを読み込む
+from app.api import auth  # 追加：認証用のルーターを読み込む
 from app.api import documents  
 from app.api import search
+
+if __name__ == "__main__":
+    import uvicorn
+    import os
+    
+    # RenderのPORT環境変数を優先、なければ8000
+    port = int(os.getenv("PORT", 8000))
+    
+    uvicorn.run(
+        "app.main:app",
+        host="0.0.0.0",  # Render対応
+        port=port,
+        reload=True
+    )
 
 app = FastAPI(
     title="RAG Knowledge API",
