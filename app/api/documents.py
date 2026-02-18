@@ -11,8 +11,8 @@ from app.core.deps import get_db, get_current_user
 from app.models.user import User
 from app.models.document import Document
 from app.schemas.document import DocumentCreate, DocumentResponse, DocumentListItem
-# from app.services.embeddings import get_embedding_service  # 一時無効化（Render用）
-from app.services.vector_store import get_vector_store      # ← 追加
+from app.services.embeddings import get_embedding_service
+from app.services.vector_store import get_vector_store
 
 router = APIRouter(prefix="/documents", tags=["ドキュメント管理"])
 
