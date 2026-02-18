@@ -8,7 +8,7 @@ from openai import OpenAI
 from app.core.deps import get_db, get_current_user
 from app.models.user import User
 from app.schemas.search import SearchRequest, SearchResponse, SearchSource
-from app.services.embeddings import get_embedding_service
+# from app.services.embeddings import get_embedding_service  # 一時無効化（Render用）
 from app.services.vector_store import get_vector_store
 from app.config import settings
 
