@@ -8,22 +8,18 @@ from typing import List
 import numpy as np
 
 
+# 中略 ...
+
 class EmbeddingService:
-    """
-    埋め込み生成サービス
-    
-    日本語対応モデルを使用してテキストをベクトル化
-    """
-    
-    def __init__(self, model_name: str = "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"):
+    def __init__(self, model_name: str = "oshizo/sbert-jsnli-l6-h384-aligned"):
         """
         初期化
-        
-        Args:
-            model_name: 使用するモデル名（日本語対応）
+        モデルを軽量な日本語対応モデルに変更
         """
         self.model = SentenceTransformer(model_name)
         self.dimension = self.model.get_sentence_embedding_dimension()
+
+# 中略 ...entence_embedding_dimension()
     
     def embed_text(self, text: str) -> np.ndarray:
         """
