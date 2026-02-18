@@ -16,6 +16,7 @@ RUN poetry config virtualenvs.create false \
 
 COPY . .
 
-EXPOSE 8000
+# Renderの動的ポートに対応
+EXPOSE $PORT
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "$PORT"]
