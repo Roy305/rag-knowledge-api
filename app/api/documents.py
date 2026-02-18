@@ -4,6 +4,8 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.orm import Session
+import PyPDF2
+import io
 
 from app.core.deps import get_db, get_current_user
 from app.models.user import User
@@ -84,7 +86,7 @@ async def upload_document(
     """
     ファイルアップロード
     
-    - テキストファイルのみ対応
+    - テキストファイルとPDF対応
     - 最大1MB
     """
     # ファイルサイズチェック
@@ -95,13 +97,33 @@ async def upload_document(
             detail="ファイルサイズは1MB以下にしてください"
         )
     
-    # テキストデコード
-    try:
-        text_content = content.decode('utf-8')
-    except UnicodeDecodeError:
+    # ファイルタイプに応じてテキスト抽出
+    if file.content_type == "application/pdf" or file.filename.lower().endswith('.pdf'):
+        # PDFからテキスト抽出
+        try:
+            pdf_reader = PyPDF2.PdfReader(io.BytesIO(content))
+            text_content = ""
+            for page in pdf_reader.pages:
+                text_content += page.extract_text() + "\n"
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"PDFの読み取りに失敗しました: {str(e)}"
+            )
+    else:
+        # テキストファイルとして処理
+        try:
+            text_content = content.decode('utf-8')
+        except UnicodeDecodeError:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="UTF-8テキストファイルまたはPDFのみ対応しています"
+            )
+    
+    if not text_content.strip():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="UTF-8テキストファイルのみ対応しています"
+            detail="ファイルからテキストを抽出できませんでした"
         )
     
     # ドキュメント数制限チェック
@@ -116,7 +138,7 @@ async def upload_document(
     new_document = Document(
         user_id=current_user.id,
         title=file.filename,
-        content=text_content
+        content=text_content.strip()
     )
     
     db.add(new_document)
@@ -129,7 +151,7 @@ async def upload_document(
         vector_store = get_vector_store(current_user.id)
         
         # 埋め込み生成
-        embedding = embedding_service.embed_text(text_content)
+        embedding = embedding_service.embed_text(text_content.strip())
         
         # FAISSに追加
         vector_store.add_document(
