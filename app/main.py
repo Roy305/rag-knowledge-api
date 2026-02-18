@@ -1,32 +1,31 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-from sqlalchemy import text
+from sqlalchemy import text, create_engine
+from sqlalchemy.orm import sessionmaker
 from app.core.deps import get_db
 from app.config import settings
 from app.api import auth  # 追加：認証用のルーターを読み込む
 from app.api import documents  
 from app.api import search
-
-if __name__ == "__main__":
-    import uvicorn
-    import os
-    
-    # RenderのPORT環境変数を優先、なければ8000
-    port = int(os.getenv("PORT", 8000))
-    
-    uvicorn.run(
-        "app.main:app",
-        host="0.0.0.0",  # Render対応
-        port=port,
-        reload=True
-    )
+from app.models import Base  # 追加：全モデルのベース
 
 app = FastAPI(
     title="RAG Knowledge API",
     description="RAG搭載ナレッジベースAPI",
     version="1.0.0",
 )
+
+# 起動時にテーブルを自動作成
+@app.on_event("startup")
+async def startup_event():
+    """アプリ起動時にテーブルを自動作成"""
+    try:
+        engine = create_engine(settings.DATABASE_URL)
+        Base.metadata.create_all(bind=engine)
+        print("✅ Database tables created/verified")
+    except Exception as e:
+        print(f"❌ Failed to create tables: {e}")
 
 # CORS設定
 app.add_middleware(
@@ -64,3 +63,17 @@ def health_check(db: Session = Depends(get_db)):
         }
     except Exception as e:
         return {"status": "unhealthy", "error": str(e)}, 500
+
+if __name__ == "__main__":
+    import uvicorn
+    import os
+    
+    # RenderのPORT環境変数を優先、なければ8000
+    port = int(os.getenv("PORT", 8000))
+    
+    uvicorn.run(
+        "app.main:app",
+        host="0.0.0.0",  # Render対応
+        port=port,
+        reload=True
+    )
