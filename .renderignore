@@ -1,0 +1,54 @@
+# Renderデプロイ用の無視ファイル
+# 不要なファイルを転送しないことでデプロイを高速化
+
+# Git関連
+.git/
+.gitignore
+
+# Pythonキャッシュ
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+.env.local
+.env.development
+
+# IDE関連
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS関連
+.DS_Store
+Thumbs.db
+
+# ドキュメント
+README.md
+*.md
+docs/
+
+# テスト
+tests/
+pytest.ini
+.coverage
+
+# ログ
+*.log
+logs/
+
+# 一時ファイル
+tmp/
+temp/
+*.tmp
+
+# Node.js（もし存在する場合）
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
