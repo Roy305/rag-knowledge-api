@@ -2,11 +2,14 @@ services:
   # Web Service（FastAPI アプリ）
   - type: web
     name: rag-knowledge-api
-    runtime: docker
+    runtime: python  # Python 3 Runtimeに変更
     region: singapore
     plan: free
     branch: main
     healthCheckPath: /health
+    # Python 3 Runtime用の設定
+    buildCommand: "pip install poetry && poetry install --no-interaction --no-ansi"
+    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1 --limit-concurrency 10 --timeout-keep-alive 5"
     envVars:
       - key: DATABASE_URL
         fromDatabase:
