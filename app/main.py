@@ -8,7 +8,7 @@ from app.config import settings
 from app.api import auth  # 追加：認証用のルーターを読み込む
 from app.api import documents  
 from app.api import search
-from app.models import Base  # 追加：全モデルのベース
+from app.models.base import Base # 追加：全モデルのベース
 
 app = FastAPI(
     title="RAG Knowledge API",
