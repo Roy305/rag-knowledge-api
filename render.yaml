@@ -7,9 +7,9 @@ services:
     plan: free
     branch: main
     healthCheckPath: /health
-    # Python 3 Runtime用の設定
-    buildCommand: "pip install poetry && poetry install --no-interaction --no-ansi"
-    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1 --limit-concurrency 10 --timeout-keep-alive 5"
+    # メモリ節約のための最適化
+    buildCommand: "pip install poetry && poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi --without dev"
+    startCommand: "python -c 'import os; port=int(os.getenv(\"PORT\", 8000)); import uvicorn; uvicorn.run(\"app.main:app\", host=\"0.0.0.0\", port=port, workers=1, limit_concurrency=5, timeout_keep_alive=5)'"
     envVars:
       - key: DATABASE_URL
         fromDatabase:

@@ -84,6 +84,6 @@ if __name__ == "__main__":
         port=port,
         reload=False,  # 本番ではreloadなしでメモリ節約
         workers=1,    # ワーカー数を制限
-        limit_concurrency=10,  # 同時接続制限
+        limit_concurrency=5,  # 同時接続をさらに制限
         timeout_keep_alive=5   # キープアライブ短縮
     )
