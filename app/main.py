@@ -70,12 +70,12 @@ def health_check(db: Session = Depends(get_db)):
     except Exception as e:
         return {"status": "unhealthy", "error": str(e)}, 500
 
+# Render Python Runtime対応：if __name__ == "__main__" の外に出す
+import os
+port = int(os.getenv("PORT", 8000))
+
 if __name__ == "__main__":
     import uvicorn
-    import os
-    
-    # RenderのPORT環境変数を優先、なければ8000
-    port = int(os.getenv("PORT", 8000))
     
     # メモリ節約のための最適化
     uvicorn.run(
