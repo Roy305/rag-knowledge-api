@@ -27,6 +27,12 @@ async def startup_event():
     except Exception as e:
         print(f"❌ Failed to create tables: {e}")
 
+# ポートバインディング確認用エンドポイント
+@app.get("/port-test")
+async def port_test():
+    """ポートが正しくバインドされているか確認"""
+    return {"message": "Port binding successful", "status": "ok"}
+
 # CORS設定
 app.add_middleware(
     CORSMiddleware,
@@ -71,9 +77,13 @@ if __name__ == "__main__":
     # RenderのPORT環境変数を優先、なければ8000
     port = int(os.getenv("PORT", 8000))
     
+    # メモリ節約のための最適化
     uvicorn.run(
         "app.main:app",
         host="0.0.0.0",  # Render対応
         port=port,
-        reload=True
+        reload=False,  # 本番ではreloadなしでメモリ節約
+        workers=1,    # ワーカー数を制限
+        limit_concurrency=10,  # 同時接続制限
+        timeout_keep_alive=5   # キープアライブ短縮
     )
