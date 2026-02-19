@@ -8,7 +8,15 @@ from pathlib import Path
 from typing import List, Tuple, Optional
 import logging
 
-# import faiss  <-- ここからは消す！
+# 起動時に一度だけFAISSをインポート
+try:
+    import faiss
+    print("✅ FAISS imported successfully at startup")
+    FAISS_AVAILABLE = True
+except ImportError as e:
+    print(f"❌ FAISS import failed: {e}")
+    FAISS_AVAILABLE = False
+    faiss = None
 
 logger = logging.getLogger(__name__)
 
