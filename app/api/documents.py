@@ -89,13 +89,26 @@ async def upload_document(
     - テキストファイルとPDF対応
     - 最大1MB
     """
+    # メモリ監視開始
+    try:
+        import psutil
+        print(f"📊 メモリ使用量開始: {psutil.virtual_memory().percent}%")
+    except ImportError:
+        print("⚠️ psutil未インストール - メモリ監視不可")
+    
+    print("🔍 Step 1: ファイル読み込み開始")
+    
     # ファイルサイズチェック
     content = await file.read()
+    print(f"📊 ファイルサイズ: {len(content)} bytes")
+    
     if len(content) > 1_000_000:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="ファイルサイズは1MB以下にしてください"
         )
+    
+    print("🔍 Step 2: テキスト抽出開始")
     
     # ファイルタイプに応じてテキスト抽出
     if file.content_type == "application/pdf" or file.filename.lower().endswith('.pdf'):
@@ -117,24 +130,13 @@ async def upload_document(
         except UnicodeDecodeError:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="UTF-8テキストファイルまたはPDFのみ対応しています"
+                detail="UTF-8でデコードできません"
             )
     
-    if not text_content.strip():
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="ファイルからテキストを抽出できませんでした"
-        )
+    print("🔍 Step 3: 埋め込み生成開始")
+    print(f"📊 テキスト長: {len(text_content)} 文字")
     
-    # ドキュメント数制限チェック
-    doc_count = db.query(Document).filter(Document.user_id == current_user.id).count()
-    if doc_count >= 10:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="ドキュメント数の上限（10件）に達しています"
-        )
-    
-    # ドキュメント作成
+    # データベースに保存
     new_document = Document(
         user_id=current_user.id,
         title=file.filename,
@@ -144,14 +146,20 @@ async def upload_document(
     db.add(new_document)
     db.commit()
     db.refresh(new_document)
+    print("🔍 Step 4: DB保存完了")
 
     # ★ 埋め込み生成してFAISSに追加 ★
     try:
+        print("📊 埋め込み前メモリ: {psutil.virtual_memory().percent}%")
+        
         embedding_service = get_embedding_service()
         vector_store = get_vector_store(current_user.id)
         
         # 埋め込み生成
+        print("🔍 Step 5: SentenceTransformerモデルロード開始")
         embedding = embedding_service.embed_text(text_content.strip())
+        print("🔍 Step 6: 埋め込み生成完了")
+        print(f"📊 埋め込み後メモリ: {psutil.virtual_memory().percent}%")
         
         # FAISSに追加
         vector_store.add_document(
@@ -160,9 +168,12 @@ async def upload_document(
             content=new_document.content,
             embedding=embedding
         )
+        print("🔍 Step 7: FAISS追加完了")
+        print(f"📊 最終メモリ: {psutil.virtual_memory().percent}%")
     except Exception as e:
         import logging
         logging.error(f"Failed to add embedding: {e}")
+        print(f"❌ 埋め込み処理エラー: {e}")
     
     
     return new_document
