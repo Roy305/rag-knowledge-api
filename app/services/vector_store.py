@@ -68,6 +68,46 @@ class VectorStore:
         self._save()
         logger.info(f"Added document {document_id} for user {self.user_id}")
     
+    def remove_document(self, document_id: int):
+        """ドキュメントをFAISSから削除"""
+        if not FAISS_AVAILABLE:
+            return
+        
+        # 削除対象のメタデータを探す
+        new_metadata = []
+        remove_indices = []
+        
+        for i, meta in enumerate(self.metadata):
+            if meta['document_id'] != document_id:
+                new_metadata.append(meta)
+            else:
+                remove_indices.append(i)
+        
+        if not remove_indices:
+            return  # 削除対象がなかった
+        
+        # 新しいインデックスを作成
+        if new_metadata:
+            # 残りのドキュメントで新しいインデックスを作成
+            new_index = faiss.IndexFlatL2(self.dimension)
+            
+            # 既存の埋め込みを再構築（簡易的な実装）
+            # 実際には埋め込みを保存しておく必要がある
+            for i in range(self.index.ntotal):
+                if i not in remove_indices:
+                    embedding = self.index.reconstruct(i)
+                    new_index.add(embedding.reshape(1, -1))
+            
+            self.index = new_index
+            self.metadata = new_metadata
+        else:
+            # 全部削除の場合
+            self.index = faiss.IndexFlatL2(self.dimension)
+            self.metadata = []
+        
+        self._save()
+        logger.info(f"Removed document {document_id} from FAISS")
+    
     def search(self, query_embedding: np.ndarray, top_k: int = 3) -> List[Tuple[dict, float]]:
         if self.index.ntotal == 0:
             return []
