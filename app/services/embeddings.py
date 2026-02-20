@@ -42,11 +42,13 @@ class EmbeddingService:
                 except Exception as e:
                     print(f"❌ ONNX load failed: {e}")
                     print("🔄 Fallback to sentence-transformers...")
+                    # ここで一度だけインポート
                     from sentence_transformers import SentenceTransformer
                     self.model = SentenceTransformer(self.model_name)
                     self.tokenizer = None
             else:
                 print("⚠️ ONNX model not found, using sentence-transformers")
+                # ここで一度だけインポート
                 from sentence_transformers import SentenceTransformer
                 self.model = SentenceTransformer(self.model_name)
                 self.tokenizer = None
