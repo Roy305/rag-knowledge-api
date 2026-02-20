@@ -23,22 +23,30 @@ class EmbeddingService:
     def _load_model(self):
         """ONNXモデルが必要になった瞬間に初めてロードする"""
         if self.model is None:
-            print(f"🚀 Loading ONNX model from {ONNX_MODEL_DIR}")
-            try:
-                from optimum.onnxruntime import ORTModelForFeatureExtraction
-                from transformers import AutoTokenizer
-                
-                # ONNXモデルとトークナイザー読み込み
-                self.model = ORTModelForFeatureExtraction.from_pretrained(
-                    str(ONNX_MODEL_DIR),
-                    provider="CPUExecutionProvider"
-                )
-                self.tokenizer = AutoTokenizer.from_pretrained(str(ONNX_MODEL_DIR))
-                print("✅ ONNX model loaded successfully")
-            except Exception as e:
-                print(f"❌ Failed to load ONNX model: {e}")
-                # フォールバック: 通常のsentence-transformers
-                print("🔄 Fallback to sentence-transformers...")
+            print(f"🚀 Loading model from {ONNX_MODEL_DIR}")
+            
+            # ONNXモデルの存在確認
+            if ONNX_MODEL_DIR.exists():
+                print("🔍 ONNX model found, loading...")
+                try:
+                    from optimum.onnxruntime import ORTModelForFeatureExtraction
+                    from transformers import AutoTokenizer
+                    
+                    # ONNXモデルとトークナイザー読み込み
+                    self.model = ORTModelForFeatureExtraction.from_pretrained(
+                        str(ONNX_MODEL_DIR),
+                        provider="CPUExecutionProvider"
+                    )
+                    self.tokenizer = AutoTokenizer.from_pretrained(str(ONNX_MODEL_DIR))
+                    print("✅ ONNX model loaded successfully")
+                except Exception as e:
+                    print(f"❌ ONNX load failed: {e}")
+                    print("🔄 Fallback to sentence-transformers...")
+                    from sentence_transformers import SentenceTransformer
+                    self.model = SentenceTransformer(self.model_name)
+                    self.tokenizer = None
+            else:
+                print("⚠️ ONNX model not found, using sentence-transformers")
                 from sentence_transformers import SentenceTransformer
                 self.model = SentenceTransformer(self.model_name)
                 self.tokenizer = None
