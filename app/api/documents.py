@@ -199,6 +199,43 @@ async def list_documents(
     return documents
 
 
+@router.delete("/{document_id}")
+async def delete_document(
+    document_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    ドキュメント削除
+    
+    - 認証必須
+    - 自分のドキュメントのみ削除可能
+    """
+    document = db.query(Document)\
+        .filter(Document.id == document_id)\
+        .filter(Document.user_id == current_user.id)\
+        .first()
+    
+    if not document:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="ドキュメントが見つかりません"
+        )
+    
+    # FAISSからも削除
+    try:
+        vector_store = get_vector_store(current_user.id)
+        vector_store.remove_document(document_id)
+    except Exception as e:
+        print(f"Failed to remove from FAISS: {e}")
+    
+    # DBから削除
+    db.delete(document)
+    db.commit()
+    
+    return {"message": "ドキュメントを削除しました"}
+
+
 @router.get("/{document_id}", response_model=DocumentResponse)
 async def get_document(
     document_id: int,
