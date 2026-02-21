@@ -37,6 +37,8 @@ docs/
 tests/
 pytest.ini
 .coverage
+htmlcov/
+.pytest_cache/
 
 # ログ
 *.log
@@ -52,3 +54,14 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# 追加の最適化
+poetry.lock
+convert_model.py
+docker-compose.yml
+Dockerfile
+よく使くコマンド.md
+test.txt
+screenshots/
+vector_stores/
+onnx_model/
