@@ -1,331 +1,239 @@
 # RAG Knowledge API
 
-FastAPI + PostgreSQL + FAISS を使った RAG（Retrieval-Augmented Generation）搭載のナレッジベース API
+🤖 **RAG-powered Knowledge Base API with FAISS Vector Search**
+
+高品質なRAG（Retrieval-Augmented Generation）チャットシステム。FAISSベクトル検索とGroq LLMを組み合わせ、ドキュメントに基づいた正確な回答を提供します。
 
 [![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green.svg)](https://fastapi.tiangolo.com/)
-[![Docker](https://img.shields.io/badge/Docker-ready-blue.svg)](https://www.docker.com/)
+[![ONNX](https://img.shields.io/badge/ONNX-Optimized-orange.svg)](https://onnx.ai/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## 📖 概要
+## ✨ 特徴
 
-ドキュメントをアップロードして、AI を使った高精度な検索と質問応答ができる API です。
-
-**主な機能:**
-- 🔐 JWT 認証によるユーザー管理
-- 📄 ドキュメントの CRUD 操作
-- 🤖 RAG による高精度な質問応答
-- 🔍 FAISS を使った高速ベクトル検索
-- 🐳 Docker 対応（一発起動）
+- 🧠 **インテリジェント検索**: FAISSベクトル検索で高速な類似度検索
+- 📄 **マルチフォーマット対応**: PDF, TXT, CSV, DOC, DOCX
+- 🚀 **ONNX最適化**: INT8量子化で最大限のパフォーマンス
+- 🎨 **プレミアムUI**: 高品質なチャットインターフェース
+- 🔐 **認証システム**: JWTベースのセキュア認証
+- 📱 **レスポンシブ**: モバイル対応デザイン
+- ⚡ **高速**: Render無料枠で最適化
 
 ## 🛠️ 技術スタック
 
-### Backend
-- **FastAPI** - 高速な Web フレームワーク
-- **SQLAlchemy** - ORM
-- **Alembic** - データベースマイグレーション
-- **PyJWT** - JWT 認証
+### バックエンド
+- **FastAPI**: 高性能Webフレームワーク
+- **FAISS**: ベクトル検索ライブラリ
+- **ONNX**: モデル最適化
+- **PostgreSQL**: データベース
+- **Groq**: LLM API (llama-3.1-8b-instant)
+- **Alembic**: データベースマイグレーション
 
-### Database
-- **PostgreSQL** - メインデータベース（Supabase）
-- **FAISS** - ベクトル検索エンジン
+### フロントエンド
+- **Next.js**: Reactフレームワーク
+- **TypeScript**: 型安全
+- **Tailwind CSS**: モダンCSS
+- **shadcn/ui**: UIコンポーネント
 
-### AI/ML
-- **sentence-transformers** - 埋め込み生成
-- **Groq API (LLaMA 3.1)** - LLM による回答生成
-
-### Infrastructure
-- **Docker** - コンテナ化
-- **Render** - ホスティング
-- **pytest** - テスト（カバレッジ 86%）
+### インフラ
+- **Render**: ホスティングプラットフォーム
+- **Vercel**: フロントエンドデプロイ
 
 ## 🚀 クイックスタート
 
-### 前提条件
+### 環境要件
+- Python 3.12+
+- Node.js 18+
+- PostgreSQL
 
-- Docker Desktop
-- Git
+### バックエンドセットアップ
 
-### 1. リポジトリをクローン
 ```bash
-git clone https://github.com/yourusername/rag-knowledge-api.git
+# 1. リポジトリクローン
+git clone https://github.com/Roy305/rag-knowledge-api.git
 cd rag-knowledge-api
-```
 
-### 2. 環境変数を設定
-```bash
+# 2. 仮想環境作成
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# 3. 依存関係インストール
+pip install poetry
+poetry install
+
+# 4. 環境変数設定
 cp .env.example .env
-nano .env
+# .envファイルを編集して必要な変数を設定
+
+# 5. データベースマイグレーション
+alembic upgrade head
+
+# 6. ONNXモデル変換（初回のみ）
+python convert_model.py
+
+# 7. サーバー起動
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-`.env` に以下を設定:
+### フロントエンドセットアップ
+
 ```bash
-GROQ_API_KEY=your-groq-api-key-here
-SECRET_KEY=your-secret-key-minimum-32-characters
+# 1. フロントエンドディレクトリに移動
+cd ../rag-knowledge-frontend
+
+# 2. 依存関係インストール
+npm install
+
+# 3. 環境変数設定
+cp .env.example .env.local
+# .env.localファイルを編集
+
+# 4. 開発サーバー起動
+npm run dev
 ```
 
-### 3. Docker で起動
-```bash
-docker compose up
+## 🔧 環境変数
+
+### バックエンド (.env)
+```env
+DATABASE_URL=postgresql://user:password@localhost:5432/rag_db
+SECRET_KEY=your-secret-key-here
+GROQ_API_KEY=your-groq-api-key
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+ENVIRONMENT=development
 ```
 
-### 4. ブラウザで確認
-```
-http://localhost:8000/docs
-```
-
-**→ Swagger UI が開けば成功！**
-
-## 📚 API ドキュメント
-
-### 認証
-
-#### ユーザー登録
-```bash
-POST /auth/register
-Content-Type: application/json
-
-{
-  "email": "user@example.com",
-  "password": "Password123"
-}
+### フロントエンド (.env.local)
+```env
+NEXT_PUBLIC_API_URL=http://127.0.0.1:8000
 ```
 
-#### ログイン
-```bash
-POST /auth/login
-Content-Type: application/json
+## 📖 APIドキュメント
 
-{
-  "email": "user@example.com",
-  "password": "Password123"
-}
-```
-
-**レスポンス:**
-```json
-{
-  "access_token": "eyJhbGci...",
-  "token_type": "bearer"
-}
-```
+### 認証エンドポイント
+- `POST /auth/register` - ユーザー登録
+- `POST /auth/login` - ログイン
+- `GET /auth/me` - ユーザー情報取得
 
 ### ドキュメント管理
+- `POST /documents/upload` - ドキュメントアップロード
+- `GET /documents` - ドキュメント一覧
+- `DELETE /documents/{id}` - ドキュメント削除
+- `GET /documents/{id}` - ドキュメント詳細
 
-#### ドキュメント作成
+### 検索
+- `POST /search` - RAG検索
+
+### APIドキュメント
+サーバー起動後、以下のURLでSwagger UIを確認できます：
+- http://localhost:8000/docs
+
+## 🚀 Renderデプロイ
+
+### 1. バックエンドデプロイ
 ```bash
-POST /documents
-Authorization: Bearer {token}
-Content-Type: application/json
+# GitHubにプッシュ
+git push origin main
 
-{
-  "title": "FastAPI について",
-  "content": "FastAPI は高速な Web フレームワークです。"
-}
+# Renderダッシュボードで：
+# 1. 新しいWeb Service作成
+# 2. GitHubリポジトリ連携
+# 3. Python 3 Runtime選択
+# 4. 環境変数設定
+# 5. デプロイ実行
 ```
 
-#### ドキュメント一覧
+### 2. フロントエンドデプロイ
 ```bash
-GET /documents
-Authorization: Bearer {token}
-```
-
-#### RAG 検索
-```bash
-POST /search
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "query": "FastAPI の特徴は？",
-  "top_k": 3
-}
-```
-
-**レスポンス:**
-```json
-{
-  "query": "FastAPI の特徴は？",
-  "answer": "FastAPIの主な特徴は...",
-  "sources": [
-    {
-      "document_id": 1,
-      "title": "FastAPI について",
-      "content": "...",
-      "distance": 0.234
-    }
-  ]
-}
-```
-
-## 🧪 テスト
-```bash
-# 全テスト実行
-poetry run pytest
-
-# カバレッジ測定
-poetry run pytest --cov=app --cov-report=html
-
-# カバレッジ結果を確認
-open htmlcov/index.html
-```
-
-**テストカバレッジ: 86%**
-
-## 🐳 Docker コマンド
-```bash
-# 起動
-docker compose up
-
-# バックグラウンドで起動
-docker compose up -d
-
-# 停止
-docker compose down
-
-# 完全削除（データも消える）
-docker compose down -v
-
-# ログ確認
-docker compose logs
+# Vercelにデプロイ
+npm run build
+vercel --prod
 ```
 
 ## 📁 プロジェクト構造
+
 ```
 rag-knowledge-api/
 ├── app/
-│   ├── api/              # API エンドポイント
-│   │   ├── auth.py       # 認証
-│   │   ├── documents.py  # ドキュメント管理
-│   │   └── search.py     # RAG 検索
-│   ├── core/             # コア機能
-│   │   ├── security.py   # JWT 認証
-│   │   └── deps.py       # 依存性注入
-│   ├── models/           # SQLAlchemy モデル
-│   │   ├── user.py
-│   │   └── document.py
-│   ├── schemas/          # Pydantic スキーマ
-│   ├── services/         # ビジネスロジック
-│   │   ├── embeddings.py # 埋め込み生成
-│   │   └── vector_store.py # FAISS 操作
-│   ├── config.py         # 設定
-│   ├── database.py       # DB 接続
-│   └── main.py           # エントリーポイント
-├── tests/                # テストコード
-├── alembic/              # マイグレーション
-├── docker-compose.yml    # Docker 設定
-├── Dockerfile
-├── pyproject.toml        # Poetry 設定
-└── README.md
+│   ├── api/           # APIエンドポイント
+│   ├── core/          # 認証・依存関係
+│   ├── models/        # データベースモデル
+│   ├── schemas/       # Pydanticスキーマ
+│   ├── services/      # ビジネスロジック
+│   └── main.py        # FastAPIアプリケーション
+├── alembic/           # データベースマイグレーション
+├── tests/             # テスト
+├── convert_model.py   # ONNX変換スクリプト
+└── pyproject.toml     # 依存関係
+
+rag-knowledge-frontend/
+├── src/
+│   ├── app/           # Next.jsページ
+│   ├── components/    # Reactコンポーネント
+│   └── config/        # 設定ファイル
+└── package.json       # 依存関係
 ```
 
-## 🔧 開発環境セットアップ（Docker なし）
+## 🧪 テスト
 
-### 1. Python 3.12 をインストール
 ```bash
-pyenv install 3.12.2
-pyenv local 3.12.2
+# バックエンドテスト
+pytest
+
+# フロントエンドテスト
+npm test
 ```
 
-### 2. Poetry をインストール
-```bash
-curl -sSL https://install.python-poetry.org | python3 -
-```
+## 🎯 使い方
 
-### 3. 依存パッケージをインストール
-```bash
-poetry install
-```
+1. **ユーザー登録**: `/signup` でアカウント作成
+2. **ログイン**: 認証トークン取得
+3. **ドキュメントアップロード**: PDFやテキストファイルをアップロード
+4. **チャット**: アップロードしたドキュメントについて質問
+5. **回答**: AIがドキュメントに基づいて回答
 
-### 4. データベースマイグレーション
-```bash
-poetry run alembic upgrade head
-```
+## 🔍 機能詳細
 
-### 5. サーバー起動
-```bash
-poetry run uvicorn app.main:app --reload
-```
+### RAG検索
+- FAISSベクトル検索で関連ドキュメントを特定
+- Groq LLMで自然な回答を生成
+- 参照資料の明示
 
-## 🌐 デプロイ
+### ファイル処理
+- PDFテキスト抽出
+- UTF-8エンコーディング対応
+- 1MBサイズ制限
 
-### Render へのデプロイ
+### パフォーマンス最適化
+- ONNX + INT8量子化
+- FAISSインデックス最適化
+- メモリ使用量最小化
 
-1. GitHub にプッシュ
-2. Render にログイン
-3. "New +" → "Blueprint"
-4. リポジトリを選択
-5. `render.yaml` を自動検出
-6. "Apply" をクリック
+## 🤝 貢献
 
-**環境変数（Render で設定）:**
-- `GROQ_API_KEY`
-- `SECRET_KEY`（自動生成）
+1. Forkする
+2. 機能ブランチ作成 (`git checkout -b feature/AmazingFeature`)
+3. コミット (`git commit -m 'Add some AmazingFeature'`)
+4. プッシュ (`git push origin feature/AmazingFeature`)
+5. Pull Request作成
 
-## 📊 技術的な工夫点
+## 📄 ライセンス
 
-### 1. RAG の実装
-
-- **埋め込み生成**: sentence-transformers（多言語対応モデル）
-- **ベクトル検索**: FAISS（Meta 製、本番環境で実績）
-- **LLM**: Groq API（高速、無料枠が大きい）
-
-### 2. セキュリティ
-
-- JWT トークン（24時間有効）
-- パスワードハッシュ化（bcrypt）
-- CORS 設定
-- 環境変数管理
-
-### 3. パフォーマンス
-
-- FAISS による高速ベクトル検索
-- 非同期処理（FastAPI）
-- コネクションプーリング
-- ベクトルストアの永続化
-
-### 4. テスト
-
-- pytest によるユニットテスト
-- モック化（Groq API）
-- カバレッジ 86%
-- CI/CD 対応
-
-## 🤝 コントリビューション
-
-Pull Request を歓迎します。
-
-1. Fork する
-2. Feature ブランチを作成 (`git checkout -b feature/amazing-feature`)
-3. コミット (`git commit -m 'Add amazing feature'`)
-4. プッシュ (`git push origin feature/amazing-feature`)
-5. Pull Request を開く
-
-## 📝 ライセンス
-
-MIT License
-
-## 👤 作成者
-
-**Roy Bryant**
-- GitHub: [@yourusername](https://github.com/yourusername)
-- Email: royantbryant@gmail.com
+このプロジェクトはMITライセンスの下で公開されています。詳細は [LICENSE](LICENSE) ファイルを参照してください。
 
 ## 🙏 謝辞
 
-- FastAPI コミュニティ
-- Anthropic（Claude）
-- Groq（無料 LLM API）
+- [FastAPI](https://fastapi.tiangolo.com/) - 高性能Webフレームワーク
+- [FAISS](https://faiss.ai/) - ベクトル検索ライブラリ
+- [Groq](https://groq.com/) - 高速LLM API
+- [Next.js](https://nextjs.org/) - Reactフレームワーク
+- [Tailwind CSS](https://tailwindcss.com/) - CSSフレームワーク
 
-## 📸 スクリーンショット
+## 📞 サポート
 
-### Swagger UI
-![Swagger UI](screenshots/swagger-ui.png)
+問題がある場合や質問がある場合は、[Issues](https://github.com/Roy305/rag-knowledge-api/issues) を作成してください。
 
-### RAG 検索
-![RAG Search](screenshots/rag-search.png)
+---
 
-## 🔗 リンク
+**🚀 高品質なRAGシステムを構築しましょう！**
 
-- [本番環境](https://rag-knowledge-api.onrender.com/docs)
-- [GitHub リポジトリ](https://github.com/yourusername/rag-knowledge-api)
