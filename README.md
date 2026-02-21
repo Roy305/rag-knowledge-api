@@ -45,8 +45,24 @@
 - Python 3.12+
 - Node.js 18+
 - PostgreSQL
+- Docker Desktop (推奨)
 
-### バックエンドセットアップ
+### 方法1: Dockerで起動（推奨）
+
+```bash
+# 1. リポジトリクローン
+git clone https://github.com/Roy305/rag-knowledge-api.git
+cd rag-knowledge-api
+
+# 2. Dockerで起動（全ての依存関係を含む）
+docker compose up
+
+# 3. ブラウザで確認
+# API: http://localhost:8000/docs
+# DB: localhost:5432
+```
+
+### 方法2: ローカル開発
 
 ```bash
 # 1. リポジトリクローン
@@ -74,6 +90,21 @@ python convert_model.py
 # 7. サーバー起動
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
+
+### 🐳 Docker vs ローカル開発
+
+| 項目 | Docker | ローカル | 推奨 |
+|------|--------|----------|--------|
+| セットアップ容易さ | 😊 一発 | ⚠️ 手動 | Docker |
+| 環境再現性 | 😊 高い | 😡 低い | Docker |
+| メモリ使用量 | ⚠️ 高い | 😊 低い | ローカル |
+| 開発速度 | ⚠️ 遅い | 😊 速い | ローカル |
+| ビルド時間 | ⚠️ 長い | 😊 速い | ローカル |
+| デバッグ容易さ | ⚠️ 複雑 | 😊 簡単 | ローカル |
+
+**結論:**
+- **初心者**: Docker推奨（環境構築が簡単）
+- **経験者**: ローカル開発推奨（開発速度が速い）
 
 ### フロントエンドセットアップ
 
