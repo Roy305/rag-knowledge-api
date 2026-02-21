@@ -22,9 +22,11 @@ htmlcov/
 # Env
 .env
 .env.local
+.env.local.example
 
 # Vector stores
 vector_stores/
+onnx_model/
 
 # Docker
 .dockerignore
@@ -39,3 +41,24 @@ vector_stores/
 
 # Alembic
 alembic/versions/__pycache__/
+
+# Development files
+test.txt
+よく使うコマンド.md
+
+# Coverage reports
+coverage.xml
+*.cover
+.hypothesis/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# ONNX models (if generated locally)
+*.onnx
+*.ort
