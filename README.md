@@ -136,8 +136,18 @@ ENVIRONMENT=development
 
 ### フロントエンド (.env.local)
 ```env
+# ローカル開発
 NEXT_PUBLIC_API_URL=http://127.0.0.1:8000
+
+# Vercelデプロイ用（Vercelダッシュボードで設定）
+NEXT_PUBLIC_API_URL=https://rag-knowledge-api.onrender.com
 ```
+
+**🚨 Vercel環境変数設定:**
+1. Vercelダッシュボード → Project → Settings → Environment Variables
+2. 以下を追加:
+   - `NEXT_PUBLIC_API_URL` = `https://rag-knowledge-api.onrender.com`
+3. Redeploy
 
 ## 📖 APIドキュメント
 
