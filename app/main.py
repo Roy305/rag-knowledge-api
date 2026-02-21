@@ -70,6 +70,11 @@ def health_check(db: Session = Depends(get_db)):
     except Exception as e:
         return {"status": "unhealthy", "error": str(e)}, 500
 
+@app.get("/", tags=["Root"])
+def root():
+    """Renderヘルスチェック用の軽量エンドポイント"""
+    return {"status": "ok", "message": "RAG Knowledge API is running"}
+
 # Render Python Runtime対応：if __name__ == "__main__" の外に出す
 import os
 port = int(os.getenv("PORT", 8000))

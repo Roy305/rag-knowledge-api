@@ -6,8 +6,8 @@ services:
     region: singapore
     plan: free
     branch: main
-    healthCheckPath: /health
-    buildCommand: "pip install poetry && poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi --without dev && export CUDA_VISIBLE_DEVICES='' && export TORCH_CUDA_ARCH_LIST=''"
+    healthCheckPath: "/"
+    buildCommand: "pip install poetry --no-cache-dir && poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi --without dev --no-cache"
     startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
     envVars:
       - key: DATABASE_URL
