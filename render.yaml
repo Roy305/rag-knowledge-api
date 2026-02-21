@@ -7,7 +7,7 @@ services:
     plan: free
     branch: main
     healthCheckPath: /health
-    buildCommand: "pip install poetry && poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi --without dev"
+    buildCommand: "pip install poetry && poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi --without dev && export CUDA_VISIBLE_DEVICES='' && export TORCH_CUDA_ARCH_LIST=''"
     startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
     envVars:
       - key: DATABASE_URL
@@ -24,6 +24,10 @@ services:
         value: 1440
       - key: ENVIRONMENT
         value: production
+      - key: CUDA_VISIBLE_DEVICES
+        value: ""
+      - key: TORCH_CUDA_ARCH_LIST
+        value: ""
 
 # PostgreSQL Database
 databases:
