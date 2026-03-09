@@ -14,6 +14,42 @@ from app.schemas.document import DocumentCreate, DocumentResponse, DocumentListI
 from app.services.embeddings import get_embedding_service
 from app.services.vector_store import get_vector_store
 
+def chunk_text_semantic(text: str, max_length: int = 500, overlap: int = 50):
+    """意味的なテキスト分割"""
+    chunks = []
+    
+    # 段落で分割
+    paragraphs = re.split(r'\n\n+', text)
+    
+    for paragraph in paragraphs:
+        paragraph = paragraph.strip()
+        if not paragraph:
+            continue
+            
+        # 長い段落は分割
+        if len(paragraph) > max_length:
+            # 文で分割
+            sentences = re.split(r'[。！？]', paragraph)
+            current_chunk = ""
+            
+            for sentence in sentences:
+                if not sentence.strip():
+                    continue
+                    
+                if len(current_chunk + sentence + "。") <= max_length:
+                    current_chunk += sentence + "。"
+                else:
+                    if current_chunk.strip():
+                        chunks.append(current_chunk.strip())
+                    current_chunk = sentence + "。"
+            
+            if current_chunk.strip():
+                chunks.append(current_chunk.strip())
+        else:
+            chunks.append(paragraph)
+    
+    return chunks
+
 router = APIRouter(prefix="/documents", tags=["ドキュメント管理"])
 
 
