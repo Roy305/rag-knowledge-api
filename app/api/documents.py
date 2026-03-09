@@ -157,17 +157,25 @@ async def upload_document(
         
         # 埋め込み生成
         print("🔍 Step 5: SentenceTransformerモデルロード開始")
-        embedding = embedding_service.embed_text(text_content.strip())
-        print("🔍 Step 6: 埋め込み生成完了")
+        # ドキュメント分割（Chunking）
+        chunks = chunk_text_semantic(text_content.strip(), max_length=800, overlap=100)
+        print(f"📊 ドキュメントを {len(chunks)} つのチャンクに分割")
         print(f"📊 埋め込み後メモリ: {psutil.virtual_memory().percent}%")
         
-        # FAISSに追加
-        vector_store.add_document(
-            document_id=new_document.id,
-            title=new_document.title,
-            content=new_document.content,
-            embedding=embedding
-        )
+        # 各チャンクを埋め込み生成してFAISSに追加
+        for i, chunk in enumerate(chunks):
+            print(f"🔍 チャンク {i+1}/{len(chunks)} 処理中...")
+            
+            # 埋め込み生成
+            embedding = embedding_service.embed_text(chunk)
+            
+            # FAISSに追加
+            vector_store.add_document(
+                document_id=new_document.id,
+                title=f"{new_document.title} (チャンク {i+1})",
+                content=chunk,
+                embedding=embedding
+            )
         print("🔍 Step 7: FAISS追加完了")
         print(f"📊 最終メモリ: {psutil.virtual_memory().percent}%")
     except Exception as e:
