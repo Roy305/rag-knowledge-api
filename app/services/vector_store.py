@@ -107,20 +107,22 @@ class VectorStore:
         # 新しいインデックスを作成
         if new_metadata:
             # 残りのドキュメントで新しいインデックスを作成
-            new_index = faiss.IndexFlatL2(self.dimension)
+            new_index = faiss.IndexFlatIP(self.dimension)  # IndexFlatIPに統一
             
             # 既存の埋め込みを再構築（簡易的な実装）
             # 実際には埋め込みを保存しておく必要がある
             for i in range(self.index.ntotal):
                 if i not in remove_indices:
                     embedding = self.index.reconstruct(i)
-                    new_index.add(embedding.reshape(1, -1))
+                    # L2正規化を適用して追加
+                    normalized_embedding = faiss.normalize_L2(embedding.reshape(1, -1))
+                    new_index.add(normalized_embedding)
             
             self.index = new_index
             self.metadata = new_metadata
         else:
             # 全部削除の場合
-            self.index = faiss.IndexFlatL2(self.dimension)
+            self.index = faiss.IndexFlatIP(self.dimension)  # IndexFlatIPに統一
             self.metadata = []
         
         self._save()
