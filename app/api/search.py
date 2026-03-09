@@ -47,6 +47,11 @@ async def search_documents(
     # 1. クエリの埋め込み生成
     query_embedding = embedding_service.embed_text(search_request.query)
     
+    # L2正規化を適用
+    import faiss
+    import numpy as np
+    query_embedding = faiss.normalize_L2(np.array([query_embedding]).astype('float32'))[0]
+    
     # 2. 類似ドキュメント検索
     search_results = vector_store.search(query_embedding, top_k=search_request.top_k)
     

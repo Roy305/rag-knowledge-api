@@ -54,7 +54,7 @@ class VectorStore:
     def _create_new_index(self):
         """新規インデックス作成"""
         import faiss  # ここでインポート！
-        self.index = faiss.IndexFlatL2(self.dimension)
+        self.index = faiss.IndexFlatIP(self.dimension)  # 内積インデックスに変更
         self.metadata = []
         logger.info(f"Created new index for user {self.user_id}")
     
@@ -64,10 +64,13 @@ class VectorStore:
         import numpy as np
         
         if self.index is None:
-            self.index = faiss.IndexFlatL2(self.dimension)
+            self.index = faiss.IndexFlatIP(self.dimension)  # 内積インデックスに統一
         
         # 埋め込みベクトルをnumpy配列に変換
         embedding_array = np.array([embedding]).astype('float32')
+        
+        # L2正規化を適用
+        embedding_array = faiss.normalize_L2(embedding_array)
         
         # インデックスにベクトルを追加
         self.index.add(embedding_array)
