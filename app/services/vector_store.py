@@ -58,15 +58,30 @@ class VectorStore:
         self.metadata = []
         logger.info(f"Created new index for user {self.user_id}")
     
-    def add_document(self, document_id: int, title: str, content: str, embedding: np.ndarray):
-        self.index.add(embedding.reshape(1, -1))
+    def add_document(self, document_id: int, title: str, content: str, embedding: List[float]):
+        """ドキュメントをFAISSインデックスに追加"""
+        import faiss
+        import numpy as np
+        
+        if self.index is None:
+            self.index = faiss.IndexFlatL2(self.dimension)
+        
+        # 埋め込みベクトルをnumpy配列に変換
+        embedding_array = np.array([embedding]).astype('float32')
+        
+        # インデックスにベクトルを追加
+        self.index.add(embedding_array)
+        
+        # メタデータを追加
         self.metadata.append({
             'document_id': document_id,
             'title': title,
             'content': content
         })
+        
+        # 即時保存
         self._save()
-        logger.info(f"Added document {document_id} for user {self.user_id}")
+        logger.info(f"Added document {document_id} to index. Total: {len(self.metadata)}")
     
     def remove_document(self, document_id: int):
         """ドキュメントをFAISSから削除"""
@@ -127,7 +142,16 @@ class VectorStore:
     def get_document_count(self) -> int:
         return len(self.metadata)
 
+# シングルトン管理
+_vector_stores = {}
+
 def get_vector_store(user_id: int) -> VectorStore:
+    """ユーザーごとのVectorStoreシングルトンを取得"""
     from app.services.embeddings import get_embedding_service
-    embedding_service = get_embedding_service()
-    return VectorStore(user_id, dimension=embedding_service.dimension)
+    
+    if user_id not in _vector_stores:
+        embedding_service = get_embedding_service()
+        _vector_stores[user_id] = VectorStore(user_id, dimension=embedding_service.dimension)
+        logger.info(f"Created new VectorStore for user {user_id}")
+    
+    return _vector_stores[user_id]
