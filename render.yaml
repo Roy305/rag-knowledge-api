@@ -8,7 +8,7 @@ services:
     branch: main
     healthCheckPath: "/"
     buildCommand: poetry config virtualenvs.create false && poetry lock && poetry install --no-interaction --no-ansi --without dev
-    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1 --worker-class uvicorn.workers.UvicornWorker"
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1 --worker-class uvicorn.workers.UvicornWorker
     envVars:
       - key: DATABASE_URL
         fromDatabase:
