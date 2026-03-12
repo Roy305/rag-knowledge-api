@@ -11,7 +11,7 @@ services:
       export PATH="/opt/render/project/poetry/bin:$PATH"
       poetry config virtualenvs.create false
       poetry install --no-interaction --no-ansi --without dev
-    startCommand: /opt/render/project/poetry/bin/poetry run uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       # 環境変数はそのまま保持
       - key: DATABASE_URL
