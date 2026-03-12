@@ -7,8 +7,8 @@ services:
     plan: free
     branch: main
     healthCheckPath: "/"
-    buildCommand: "pip install poetry --no-cache-dir && poetry config virtualenvs.create false && poetry install --no-interaction --no-ansi --without dev --no-cache"
-    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    buildCommand: "pip install poetry --no-cache-dir && poetry config virtualenvs.create false && poetry lock && poetry install --no-interaction --no-ansi --without dev"
+    startCommand: "uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1 --worker-class uvicorn.workers.UvicornWorker"
     envVars:
       - key: DATABASE_URL
         fromDatabase:
