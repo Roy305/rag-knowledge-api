@@ -11,10 +11,9 @@ services:
       export PATH="/opt/render/project/poetry/bin:$PATH"
       poetry config virtualenvs.create false
       poetry install --no-interaction --no-ansi --without dev
-    startCommand: |
-      export PATH="/opt/render/project/poetry/bin:$PATH"
-      poetry run uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    startCommand: /opt/render/project/poetry/bin/poetry run uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
+      # 環境変数はそのまま保持
       - key: DATABASE_URL
         fromDatabase:
           name: rag-knowledge-db
@@ -31,10 +30,10 @@ services:
         value: production
       - key: CUDA_VISIBLE_DEVICES
         value: ""
-      - key: TORCH_CUDA_ARCH_LIST
+      - key: TORCH_CUDA_VISIBLE_DEVICES
         value: ""
 
-# PostgreSQL Database
+# PostgreSQL Database（そのまま）
 databases:
   - name: rag-knowledge-db
     databaseName: rag_knowledge_db
