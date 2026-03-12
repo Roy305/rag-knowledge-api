@@ -128,14 +128,24 @@ class VectorStore:
         self._save()
         logger.info(f"Removed document {document_id} from FAISS")
     
-    def search(self, query_embedding: np.ndarray, top_k: int = 3) -> List[Tuple[dict, float]]:
+    def search(self, query_embedding: np.ndarray, top_k: int = 3):
+
         if self.index.ntotal == 0:
             return []
-        distances, indices = self.index.search(query_embedding.reshape(1, -1), min(top_k, self.index.ntotal))
+        k = min(top_k, self.index.ntotal)
+
+        distances, indices = self.index.search(
+            query_embedding.reshape(1, -1),
+            k
+        )
+
         results = []
+
         for idx, distance in zip(indices[0], distances[0]):
             if idx < len(self.metadata):
-                results.append((self.metadata[idx], float(distance)))
+                metadata = self.metadata[idx]
+                results.append((metadata, float(distance)))
+
         return results
     
     def _save(self):
