@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File
 from sqlalchemy.orm import Session
 import PyPDF2
 import io
-
+import re
 from app.core.deps import get_db, get_current_user
 from app.models.user import User
 from app.models.document import Document
