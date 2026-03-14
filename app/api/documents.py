@@ -103,9 +103,6 @@ async def create_document(
     
     return new_document
 
-    
-    return new_document
-
 
 
 @router.post("/upload", response_model=DocumentResponse, status_code=status.HTTP_201_CREATED)
@@ -187,7 +184,7 @@ async def upload_document(
         vector_store = get_vector_store(current_user.id)
         
         # 埋め込み生成
-        print("🔍 Step 5: SentenceTransformerモデルロード開始")
+        print("🔍 Step 5: Jina API呼び出し開始")
         # ドキュメント分割（Chunking）
         chunks = chunk_text_semantic(text_content.strip(), max_length=800, overlap=100)
         print(f"📊 ドキュメントを {len(chunks)} つのチャンクに分割")
@@ -300,44 +297,3 @@ async def get_document(
     
     return document
 
-
-@router.delete("/{document_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_document(
-    document_id: int,
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db)
-):
-    """
-    ドキュメント削除
-    
-    - 認証必須
-    - 自分のドキュメントのみ削除可能
-    - FAISSインデックスからも削除
-    """
-    document = db.query(Document).filter(
-        Document.id == document_id,
-        Document.user_id == current_user.id
-    ).first()
-    
-    if not document:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="ドキュメントが見つかりません"
-        )
-    
-    # 1. まずDBから削除（これが真実の源泉）
-    db.delete(document)
-    db.commit()
-    
-    # 2. その後FAISSから削除
-    # 失敗してもDBはすでに削除されてるので、検索結果には表示されない
-    try:
-        vector_store = get_vector_store(current_user.id)
-        vector_store.remove_document(document_id)
-    except Exception as e:
-        import logging
-        logging.error(f"Failed to remove document {document_id} from vector store: {e}")
-        # エラーログを残すが、処理は続行
-        # FAISSに残っても、次回の検索でDBに存在しないドキュメントは除外される
-    
-    return None

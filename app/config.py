@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     
     # LLM API
     GROQ_API_KEY: str
+    
+    # Embeddings API
+    JINA_API_KEY: str
 
     model_config = SettingsConfigDict(
         env_file=str(ENV_FILE),
@@ -39,3 +42,7 @@ if settings.GROQ_API_KEY:
     print(f"[CONFIG] GROQ_API_KEY loaded: {settings.GROQ_API_KEY[:20]}...")
 else:
     print("[CONFIG] GROQ_API_KEY: NOT LOADED")
+if settings.JINA_API_KEY:
+    print(f"[CONFIG] JINA_API_KEY loaded: {settings.JINA_API_KEY[:20]}...")
+else:
+    print("[CONFIG] JINA_API_KEY: NOT LOADED")

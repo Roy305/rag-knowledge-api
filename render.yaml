@@ -22,6 +22,8 @@ services:
         generateValue: true
       - key: GROQ_API_KEY
         sync: false
+      - key: JINA_API_KEY
+        sync: false
       - key: ALGORITHM
         value: HS256
       - key: ACCESS_TOKEN_EXPIRE_MINUTES

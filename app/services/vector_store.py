@@ -21,7 +21,7 @@ except ImportError as e:
 logger = logging.getLogger(__name__)
 
 class VectorStore:
-    def __init__(self, user_id: int, dimension: int = 384, storage_dir: str = "./vector_stores"):
+    def __init__(self, user_id: int, dimension: int = 1024, storage_dir: str = "./vector_stores"):
         self.user_id = user_id
         self.dimension = dimension
         self.storage_dir = Path(storage_dir)

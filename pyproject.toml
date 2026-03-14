@@ -26,6 +26,7 @@ psutil = "^5.9.0"
 onnxruntime = "^1.16.0"
 faiss-cpu = "^1.7.4"
 sentence-transformers = "^2.2.2"
+requests = "^2.31.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.4"
