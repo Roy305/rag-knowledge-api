@@ -11,7 +11,7 @@ from optimum.exporters.onnx import main_export
 
 def convert_model():
     """モデルをONNX + INT8量子化に変換"""
-    model_id = "oshizo/sbert-jsnli-l6-h384-aligned"
+    model_id = "oshizo/sbert-jsnli-luke-japanese-base-lite"
     output_dir = "onnx_model"
     
     print(f"🚀 モデル変換開始: {model_id}")
