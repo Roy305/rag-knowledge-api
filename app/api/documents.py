@@ -200,7 +200,7 @@ async def upload_document(
             # FAISSに追加
             vector_store.add_document(
                 document_id=new_document.id,
-                title=f"{new_document.title} (チャンク {i+1})",
+                title=new_document.title,
                 content=chunk,
                 embedding=embedding
             )
