@@ -11,14 +11,14 @@ from pathlib import Path
 ONNX_MODEL_DIR = Path("onnx_model")
 
 class EmbeddingService:
-    def __init__(self, model_name: str = "oshizo/sbert-jsnli-l6-h384-aligned"):
+    def __init__(self, model_name: str = "oshizo/sbert-jsnli-luke-japanese-base-lite"):
         """
         ONNXモデルで初期化
         """
         self.model_name = model_name
         self.model = None
         self.tokenizer = None
-        self.dimension = 384  # SBERTの固定次元数
+        self.dimension = 768  # SBERTの固定次元数
 
     def _load_model(self):
         """ONNXモデルが必要になった瞬間に初めてロードする"""
