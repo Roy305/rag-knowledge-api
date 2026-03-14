@@ -71,7 +71,7 @@ class VectorStore:
         embedding_array = np.array([embedding]).astype('float32')
         
         # L2正規化を適用
-        embedding_array = faiss.normalize_L2(embedding_array)
+        faiss.normalize_L2(embedding_array)
         
         # インデックスにベクトルを追加
         self.index.add(embedding_array)
@@ -116,7 +116,8 @@ class VectorStore:
                 if i not in remove_indices:
                     embedding = self.index.reconstruct(i)
                     # L2正規化を適用して追加
-                    normalized_embedding = faiss.normalize_L2(embedding.reshape(1, -1))
+                    normalized_embedding = embedding.reshape(1, -1)
+                    faiss.normalize_L2(normalized_embedding)
                     new_index.add(normalized_embedding)
             
             self.index = new_index

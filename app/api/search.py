@@ -38,7 +38,9 @@ async def search_documents(
     vector_store = get_vector_store(current_user.id)
     
     # ドキュメントがない場合
-    if vector_store.get_document_count() == 0:
+    from app.models.document import Document
+    doc_count = db.query(Document).filter(Document.user_id == current_user.id).count()
+    if doc_count == 0:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="検索対象のドキュメントがありません。先にドキュメントをアップロードしてください。"
@@ -50,7 +52,9 @@ async def search_documents(
     # L2正規化を適用
     import faiss
     import numpy as np
-    query_embedding = faiss.normalize_L2(np.array([query_embedding]).astype('float32'))[0]
+    query_embedding_array = np.array([query_embedding]).astype('float32')
+    faiss.normalize_L2(query_embedding_array)
+    query_embedding = query_embedding_array[0]
     
     # 2. 類似ドキュメント検索
     search_results = vector_store.search(query_embedding, top_k=search_request.top_k)
