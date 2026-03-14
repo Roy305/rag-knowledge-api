@@ -59,6 +59,7 @@ class VectorStore:
         logger.info(f"Created new index for user {self.user_id}")
     
     def add_document(self, document_id: int, title: str, content: str, embedding: List[float]):
+        print(f"🔍 add_document called: self.index={self.index}, dimension={self.dimension}")
         """ドキュメントをFAISSインデックスに追加"""
         import faiss
         import numpy as np
