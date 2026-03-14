@@ -207,9 +207,11 @@ async def upload_document(
         print("🔍 Step 7: FAISS追加完了")
         print(f"📊 最終メモリ: {psutil.virtual_memory().percent}%")
     except Exception as e:
+        import traceback
         import logging
         logging.error(f"Failed to add embedding: {e}")
         print(f"❌ 埋め込み処理エラー: {e}")
+        print(f"❌ トレースバック: {traceback.format_exc()}")
     
     
     return new_document
