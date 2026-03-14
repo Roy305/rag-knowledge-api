@@ -42,12 +42,15 @@ class EmbeddingService:
         }
         
         try:
+            print(f"🔍 Jina API呼び出し: key={self.api_key[:10]}...") 
             response = requests.post(
                 "https://api.jina.ai/v1/embeddings",
                 headers=headers,
                 json=data,
                 timeout=30
             )
+            print(f"🔍 Jina APIレスポンス: {response.status_code}")
+            print(f"🔍 Jina APIレスポンス body: {response.text[:200]}")
             
             if response.status_code == 200:
                 embeddings = [item["embedding"] for item in response.json()["data"]]
