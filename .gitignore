@@ -43,8 +43,7 @@ onnx_model/
 alembic/versions/__pycache__/
 
 # Development files
-test.txt
-よく使うコマンド.md
+
 
 # Coverage reports
 coverage.xml
