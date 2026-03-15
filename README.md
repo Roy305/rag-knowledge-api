@@ -1,198 +1,130 @@
 # RAG Knowledge API
 
-🤖 **RAG-powered Knowledge Base API with FAISS Vector Search**
+🔍 **ドキュメント検索＆質問応答API**
 
-高品質なRAG（Retrieval-Augmented Generation）チャットシステム。FAISSベクトル検索とGroq LLMを組み合わせ、ドキュメントに基づいた正確な回答を提供します。
+アップロードしたドキュメントに基づいて、質問に正確に回答するRAGシステム。FAISSベクトル検索とJina AI埋め込み、Groq LLMを組み合わせて使用します。
 
-[![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.115-green.svg)](https://fastapi.tiangolo.com/)
-[![ONNX](https://img.shields.io/badge/ONNX-Optimized-orange.svg)](https://onnx.ai/)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+## 📋 プロジェクト概要
 
-## ✨ 特徴
+### できること
+- 📄 **ドキュメントアップロード**: PDF、テキストファイルを登録
+- 🔍 **インテリジェント検索**: ベクトル検索で関連情報を特定
+- 💬 **質問応答**: ドキュメント内容に基づいて回答生成
+- 👤 **ユーザー管理**: JWT認証でセキュアなアクセス
+- 📱 **マルチデバイス**: レスポンシブ対応
 
-- 🧠 **インテリジェント検索**: FAISSベクトル検索で高速な類似度検索
-- 📄 **マルチフォーマット対応**: PDF, TXT, CSV, DOC, DOCX
-- 🚀 **ONNX最適化**: INT8量子化で最大限のパフォーマンス
-- 🎨 **プレミアムUI**: 高品質なチャットインターフェース
-- 🔐 **認証システム**: JWTベースのセキュア認証
-- 📱 **レスポンシブ**: モバイル対応デザイン
-- ⚡ **高速**: Render無料枠で最適化
+### アーキテクチャ
+```
+ユーザー → API → 認証 → ドキュメントアップロード
+                ↓
+          テキスト → Jina埋め込み → FAISSベクトル化
+                ↓
+          質問 → 埋め込み → 類似度検索 → Groq LLM → 回答
+```
 
 ## 🛠️ 技術スタック
 
 ### バックエンド
 - **FastAPI**: 高性能Webフレームワーク
-- **FAISS**: ベクトル検索ライブラリ
-- **ONNX**: モデル最適化
-- **PostgreSQL**: データベース
+- **Jina AI**: 埋め込み生成 (jina-embeddings-v3)
+- **FAISS**: ベクトル検索エンジン
 - **Groq**: LLM API (llama-3.1-8b-instant)
+- **PostgreSQL**: ユーザーデータ保存
 - **Alembic**: データベースマイグレーション
 
-### フロントエンド
-- **Next.js**: Reactフレームワーク
-- **TypeScript**: 型安全
-- **Tailwind CSS**: モダンCSS
-- **shadcn/ui**: UIコンポーネント
-
 ### インフラ
-- **Render**: ホスティングプラットフォーム
-- **Vercel**: フロントエンドデプロイ
+- **Render**: APIホスティング
+- **Docker**: コンテナ化デプロイ
 
-## 🚀 クイックスタート
+## 🚀 セットアップ手順
 
-### 環境要件
-- Python 3.12+
-- Node.js 18+
-- PostgreSQL
-- Docker Desktop (推奨)
-
-### 方法1: Dockerで起動（推奨）
-
+### 1. 環境準備
 ```bash
-# 1. リポジトリクローン
+# リポジトリクローン
 git clone https://github.com/Roy305/rag-knowledge-api.git
 cd rag-knowledge-api
 
-# 2. Dockerで起動（全ての依存関係を含む）
+# 環境変数設定
+cp .env.example .env
+# .envファイルを編集してAPIキーを設定
+```
+
+### 2. Dockerで起動（推奨）
+```bash
+# 全ての依存関係を含めて起動
 docker compose up
 
-# 3. ブラウザで確認
+# 確認
 # API: http://localhost:8000/docs
 # DB: localhost:5432
 ```
 
-### 方法2: ローカル開発
-
+### 3. ローカル開発
 ```bash
-# 1. リポジトリクローン
-git clone https://github.com/Roy305/rag-knowledge-api.git
-cd rag-knowledge-api
-
-# 2. 仮想環境作成
+# 仮想環境作成
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
 
-# 3. 依存関係インストール
+# 依存関係インストール
 pip install poetry
 poetry install
 
-# 4. 環境変数設定
-cp .env.example .env
-# .envファイルを編集して必要な変数を設定
-
-# 5. データベースマイグレーション
-alembic upgrade head
-
-# 6. ONNXモデル変換（初回のみ）
-python convert_model.py
-
-# 7. サーバー起動
+# サーバー起動
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### 🐳 Docker vs ローカル開発
+## 🔧 環境変数設定
 
-| 項目 | Docker | ローカル | 推奨 |
-|------|--------|----------|--------|
-| セットアップ容易さ | 😊 一発 | ⚠️ 手動 | Docker |
-| 環境再現性 | 😊 高い | 😡 低い | Docker |
-| メモリ使用量 | ⚠️ 高い | 😊 低い | ローカル |
-| 開発速度 | ⚠️ 遅い | 😊 速い | ローカル |
-| ビルド時間 | ⚠️ 長い | 😊 速い | ローカル |
-| デバッグ容易さ | ⚠️ 複雑 | 😊 簡単 | ローカル |
-
-**結論:**
-- **初心者**: Docker推奨（環境構築が簡単）
-- **経験者**: ローカル開発推奨（開発速度が速い）
-
-### フロントエンドセットアップ
-
-```bash
-# 1. フロントエンドディレクトリに移動
-cd ../rag-knowledge-frontend
-
-# 2. 依存関係インストール
-npm install
-
-# 3. 環境変数設定
-cp .env.example .env.local
-# .env.localファイルを編集
-
-# 4. 開発サーバー起動
-npm run dev
-```
-
-## 🔧 環境変数
-
-### バックエンド (.env)
+### .envファイル
 ```env
+# データベース
 DATABASE_URL=postgresql://user:password@localhost:5432/rag_db
-SECRET_KEY=your-secret-key-here
-GROQ_API_KEY=your-groq-api-key
-ACCESS_TOKEN_EXPIRE_MINUTES=30
+
+# 認証
+SECRET_KEY=your-super-secret-key-here
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=1440
+
+# AIサービス
+GROQ_API_KEY=gsk_xxxx  # https://console.groq.com/keys
+JINA_API_KEY=jina_xxxx  # https://jina.ai/embeddings/
+
+# 環境
 ENVIRONMENT=development
 ```
 
-### フロントエンド (.env.local)
-```env
-# ローカル開発
-NEXT_PUBLIC_API_URL=http://127.0.0.1:8000
+## 📖 使い方
 
-# Vercelデプロイ用（Vercelダッシュボードで設定）
-NEXT_PUBLIC_API_URL=https://rag-knowledge-api.onrender.com
+### 1. アカウント作成
+```bash
+curl -X POST "http://localhost:8000/auth/register" \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@example.com", "password": "password123"}'
 ```
 
-**🚨 Vercel環境変数設定:**
-1. Vercelダッシュボード → Project → Settings → Environment Variables
-2. 以下を追加:
-   - `NEXT_PUBLIC_API_URL` = `https://rag-knowledge-api.onrender.com`
-3. Redeploy
-
-## 📖 APIドキュメント
-
-### 認証エンドポイント
-- `POST /auth/register` - ユーザー登録
-- `POST /auth/login` - ログイン
-- `GET /auth/me` - ユーザー情報取得
-
-### ドキュメント管理
-- `POST /documents/upload` - ドキュメントアップロード
-- `GET /documents` - ドキュメント一覧
-- `DELETE /documents/{id}` - ドキュメント削除
-- `GET /documents/{id}` - ドキュメント詳細
-
-### 検索
-- `POST /search` - RAG検索
-
-### APIドキュメント
-サーバー起動後、以下のURLでSwagger UIを確認できます：
-- http://localhost:8000/docs
-
-## 🚀 Renderデプロイ
-
-### 1. バックエンドデプロイ
+### 2. ログイン
 ```bash
-# GitHubにプッシュ
-git push origin main
-
-# Renderダッシュボードで：
-# 1. 新しいWeb Service作成
-# 2. GitHubリポジトリ連携
-# 3. Python 3 Runtime選択
-# 4. 環境変数設定
-# 5. デプロイ実行
+curl -X POST "http://localhost:8000/auth/login" \
+  -H "Content-Type: application/json" \
+  -d '{"email": "user@example.com", "password": "password123"}'
 ```
 
-### 2. フロントエンドデプロイ
+### 3. ドキュメントアップロード
 ```bash
-# Vercelにデプロイ
-npm run build
-vercel --prod
+curl -X POST "http://localhost:8000/documents/upload" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -F "file=@document.pdf"
+```
+
+### 4. 質問検索
+```bash
+curl -X POST "http://localhost:8000/search" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"query": "プロジェクトの概要は？", "top_k": 3}'
 ```
 
 ## 📁 プロジェクト構造
-
 ```
 rag-knowledge-api/
 ├── app/
@@ -201,80 +133,64 @@ rag-knowledge-api/
 │   ├── models/        # データベースモデル
 │   ├── schemas/       # Pydanticスキーマ
 │   ├── services/      # ビジネスロジック
-│   └── main.py        # FastAPIアプリケーション
+│   └── main.py        # FastAPIアプリ
 ├── alembic/           # データベースマイグレーション
 ├── tests/             # テスト
-├── convert_model.py   # ONNX変換スクリプト
-└── pyproject.toml     # 依存関係
-
-rag-knowledge-frontend/
-├── src/
-│   ├── app/           # Next.jsページ
-│   ├── components/    # Reactコンポーネント
-│   └── config/        # 設定ファイル
-└── package.json       # 依存関係
+├── pyproject.toml     # 依存関係
+└── README.md          # プロジェクト説明
 ```
 
-## 🧪 テスト
+## 🚀 デプロイ
 
+### Renderへのデプロイ
+1. GitHubにプッシュ
+2. RenderでWeb Service作成
+3. リポジトリ連携
+4. 環境変数設定
+5. デプロイ実行
+
+### 環境変数（Render）
+- `DATABASE_URL`: PostgreSQL接続文字列
+- `SECRET_KEY`: JWT秘密鍵
+- `GROQ_API_KEY`: Groq APIキー
+- `JINA_API_KEY`: Jina AI APIキー
+
+## 📊 API仕様
+
+### 認証エンドポイント
+- `POST /auth/register` - ユーザー登録
+- `POST /auth/login` - ログイン
+- `GET /auth/me` - ユーザー情報
+
+### ドキュメント管理
+- `POST /documents/upload` - ファイルアップロード
+- `GET /documents` - ドキュメント一覧
+- `GET /documents/{id}` - ドキュメント詳細
+- `DELETE /documents/{id}` - ドキュメント削除
+
+### 検索
+- `POST /search` - RAG検索
+
+### APIドキュメント
+起動後: http://localhost:8000/docs
+
+## 🧪 テスト
 ```bash
 # バックエンドテスト
 pytest
 
-# フロントエンドテスト
-npm test
+# カバレッジ確認
+pytest --cov=app
 ```
-
-## 🎯 使い方
-
-1. **ユーザー登録**: `/signup` でアカウント作成
-2. **ログイン**: 認証トークン取得
-3. **ドキュメントアップロード**: PDFやテキストファイルをアップロード
-4. **チャット**: アップロードしたドキュメントについて質問
-5. **回答**: AIがドキュメントに基づいて回答
-
-## 🔍 機能詳細
-
-### RAG検索
-- FAISSベクトル検索で関連ドキュメントを特定
-- Groq LLMで自然な回答を生成
-- 参照資料の明示
-
-### ファイル処理
-- PDFテキスト抽出
-- UTF-8エンコーディング対応
-- 1MBサイズ制限
-
-### パフォーマンス最適化
-- ONNX + INT8量子化
-- FAISSインデックス最適化
-- メモリ使用量最小化
-
-## 🤝 貢献
-
-1. Forkする
-2. 機能ブランチ作成 (`git checkout -b feature/AmazingFeature`)
-3. コミット (`git commit -m 'Add some AmazingFeature'`)
-4. プッシュ (`git push origin feature/AmazingFeature`)
-5. Pull Request作成
 
 ## 📄 ライセンス
 
-このプロジェクトはMITライセンスの下で公開されています。詳細は [LICENSE](LICENSE) ファイルを参照してください。
-
-## 🙏 謝辞
-
-- [FastAPI](https://fastapi.tiangolo.com/) - 高性能Webフレームワーク
-- [FAISS](https://faiss.ai/) - ベクトル検索ライブラリ
-- [Groq](https://groq.com/) - 高速LLM API
-- [Next.js](https://nextjs.org/) - Reactフレームワーク
-- [Tailwind CSS](https://tailwindcss.com/) - CSSフレームワーク
+MIT License - 詳細は [LICENSE](LICENSE) ファイルを参照
 
 ## 📞 サポート
 
-問題がある場合や質問がある場合は、[Issues](https://github.com/Roy305/rag-knowledge-api/issues) を作成してください。
+問題報告: [GitHub Issues](https://github.com/Roy305/rag-knowledge-api/issues)
 
 ---
 
-**🚀 高品質なRAGシステムを構築しましょう！**
-
+**🔍 ドキュメントベースの知的検索システムを構築！**
